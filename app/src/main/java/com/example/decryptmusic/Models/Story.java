@@ -6,7 +6,9 @@ import java.util.regex.Pattern;
 import androidx.annotation.NonNull;
 
 public class Story {
-    private static final Pattern sPattern = Pattern.compile(".*?(\\d+) *");
+    private static final Pattern qPattern = Pattern.compile("第?(\\d+)期[ |-]?");
+    private static final Pattern jPattern = Pattern.compile("第?(\\d+)集[ |-|：]?");
+    private static final Pattern sPattern = Pattern.compile("第?(\\d+)[ |\\.]?");
     private String download_url;
     private String url;
     private String mayday;
@@ -66,13 +68,31 @@ public class Story {
         }
         String index = "00";
         String tName = this.name;
-        Matcher matcher = sPattern.matcher(tName);
+
+        Matcher matcher = qPattern.matcher(tName);
         if(matcher.find())
         {
             index = matcher.group(1);
-            tName = tName.replaceFirst(".*?(\\d+)[ |\\.]*", "").trim();
+            tName = tName.replaceFirst(".?(\\d+)期[ |-]?", "").trim();
+            return String.format("%02d.%s.mp3", Integer.parseInt(index), tName);
         }
-        return String.format("%s.%s.mp3", index, tName);
+
+        matcher = jPattern.matcher(tName);
+        if(matcher.find())
+        {
+            index = matcher.group(1);
+            tName = tName.replaceFirst(".?(\\d+)集[ |-|：]?", "").trim();
+            return String.format("%02d.%s.mp3", Integer.parseInt(index), tName);
+        }
+
+        matcher = sPattern.matcher(tName);
+        if(matcher.find())
+        {
+            index = matcher.group(1);
+            tName = tName.replaceFirst(".?(\\d+)[ |\\.]?", "").trim();
+            return String.format("%02d.%s.mp3", Integer.parseInt(index), tName);
+        }
+        return tName;
     }
 
     public void setName(String name) {
