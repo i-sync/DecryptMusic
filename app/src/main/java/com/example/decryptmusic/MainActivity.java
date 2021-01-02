@@ -10,6 +10,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.decryptmusic.Adapter.LeftRecyclerViewAdapter;
 import com.example.decryptmusic.Adapter.RightRecyclerViewAdapter;
 import com.example.decryptmusic.Models.Story;
@@ -29,11 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -292,7 +292,12 @@ public class MainActivity extends AppCompatActivity {
         {
             txt_name.setText("This Story didn't encrypt!!! Just Copy!!!");
             try {
-                Files.copy(sourceFile.toPath(), destFile.toPath());
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+                    Files.copy(sourceFile.toPath(), destFile.toPath());
+                }
+                else {
+                    FileUtil.copy(sourceFile, destFile);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -396,10 +401,16 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         // foreach all album
-        for(Map.Entry<String, List<Story>> entry : storyMap.entrySet())
+        for(final Map.Entry<String, List<Story>> entry : storyMap.entrySet())
         {
             String key = entry.getKey();
             //txt_album.setText(key);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    txt_album.setText(entry.getKey());
+                }
+            });
             Log.i("Story Album", String.format("###########%s##########", key));
             //foreach all story
             for(final Story story: entry.getValue())
