@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.example.decryptmusic.Adapter.LeftRecyclerViewAdapter;
 import com.example.decryptmusic.Adapter.RightRecyclerViewAdapter;
 import com.example.decryptmusic.Models.Story;
+import com.example.decryptmusic.Utils.FileUtil;
 import com.example.decryptmusic.Utils.MediaPlayUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -53,9 +54,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     private String rootPath = Environment.getExternalStorageDirectory().getPath();
-    private String dataPath = "/mnt/shared/decrypt/data";
-    private String sourcePath = "/mnt/shared/decrypt/source/"; //String.format("%1$s%4$s%2$s%4$s%3$s%4$s", rootPath, "Music", "source", File.separator);
-    private String destPath = "/mnt/shared/decrypt/dest/"; //String.format("%1$s%4$s%2$s%4$s%3$s%4$s", rootPath, "Music", "dest", File.separator);
+    private String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
+    private String dataPath = downloadPath + "/decrypt/data";
+    private String sourcePath = downloadPath + "/decrypt/source/"; //String.format("%1$s%4$s%2$s%4$s%3$s%4$s", rootPath, "Music", "source", File.separator);
+    private String destPath = downloadPath +  "/decrypt/dest/"; //String.format("%1$s%4$s%2$s%4$s%3$s%4$s", rootPath, "Music", "dest", File.separator);
 
     private Handler mHandler;
 
@@ -121,7 +123,14 @@ public class MainActivity extends AppCompatActivity {
         for(int i=0; i < jsonFiles.length; i++)
         {
             try {
-                String json_str = new String(Files.readAllBytes(jsonFiles[i].toPath()));
+                String json_str;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+                    json_str = new String(Files.readAllBytes(jsonFiles[i].toPath()));
+                }
+                else
+                {
+                    json_str = FileUtil.read(jsonFiles[i]);
+                }
                 JSONObject json_data = new JSONObject(json_str);
                 String album_name = json_data.getString("album_name");
 
@@ -390,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
         for(Map.Entry<String, List<Story>> entry : storyMap.entrySet())
         {
             String key = entry.getKey();
-            txt_album.setText(key);
+            //txt_album.setText(key);
             Log.i("Story Album", String.format("###########%s##########", key));
             //foreach all story
             for(final Story story: entry.getValue())
@@ -466,7 +475,12 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     try {
-                        Files.copy(sourceFile.toPath(), destFile.toPath());
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+                            Files.copy(sourceFile.toPath(), destFile.toPath());
+                        }
+                        else {
+                            FileUtil.copy(sourceFile, destFile);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
