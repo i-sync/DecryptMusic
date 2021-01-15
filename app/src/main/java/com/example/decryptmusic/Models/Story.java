@@ -1,14 +1,17 @@
 package com.example.decryptmusic.Models;
 
+import androidx.annotation.NonNull;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import androidx.annotation.NonNull;
-
 public class Story {
-    private static final Pattern qPattern = Pattern.compile("第?(\\d+)期[ |-]?");
-    private static final Pattern jPattern = Pattern.compile("第?(\\d+)集[ |-|：]?");
-    private static final Pattern sPattern = Pattern.compile("第?(\\d+)[ |\\.]?");
+    private static String qreg = "第?(\\d+)期[ -_：:]?";
+    private static String jreq = "第?(\\d+)集[ -_：:]?";
+    private static String sreq = "第?(\\d+)[ \\.]?";
+    private static final Pattern qPattern = Pattern.compile(qreg);
+    private static final Pattern jPattern = Pattern.compile(jreq);
+    private static final Pattern sPattern = Pattern.compile(sreq);
     private String download_url;
     private String url;
     private String mayday;
@@ -61,7 +64,9 @@ public class Story {
     }
 
     public String getName() {
-        //return String.format("%02d.%s.mp3", this.order_in_album , this.name.replaceFirst("^\\d*", "").trim());
+        /*if(true) {
+            return String.format("%02d.%s.mp3", this.order_in_album -1, this.name.replaceFirst("^\\d+.", "").trim());
+        }*/
         if (this.type == 2) //plan
         {
             return String.format("%02d.%s.mp3", this.order_in_album , this.name.replaceFirst("^\\d*", "").trim());
@@ -73,7 +78,7 @@ public class Story {
         if(matcher.find())
         {
             index = matcher.group(1);
-            tName = tName.replaceFirst(".?(\\d+)期[ |-]?", "").trim();
+            tName = tName.replaceFirst(qreg, "").trim();
             return String.format("%02d.%s.mp3", Integer.parseInt(index), tName);
         }
 
@@ -81,7 +86,7 @@ public class Story {
         if(matcher.find())
         {
             index = matcher.group(1);
-            tName = tName.replaceFirst(".?(\\d+)集[ |-|：]?", "").trim();
+            tName = tName.replaceFirst(jreq, "").trim();
             return String.format("%02d.%s.mp3", Integer.parseInt(index), tName);
         }
 
@@ -89,7 +94,7 @@ public class Story {
         if(matcher.find())
         {
             index = matcher.group(1);
-            tName = tName.replaceFirst(".?(\\d+)[ |\\.]?", "").trim();
+            tName = tName.replaceFirst(sreq, "").trim();
             return String.format("%02d.%s.mp3", Integer.parseInt(index), tName);
         }
         return tName;
