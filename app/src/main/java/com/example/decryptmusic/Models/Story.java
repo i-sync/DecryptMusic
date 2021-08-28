@@ -72,7 +72,8 @@ public class Story {
             return String.format("%02d.%s.mp3", this.order_in_album , this.name.replaceFirst("^\\d*", "").trim());
         }
         String index = "00";
-        String tName = this.name;
+        String tName = this.name.replaceFirst("\\D*：", "");
+        tName = tName.replaceAll("[（） :]", "-").replaceFirst("-$","");
 
         Matcher matcher = qPattern.matcher(tName);
         if(matcher.find())
