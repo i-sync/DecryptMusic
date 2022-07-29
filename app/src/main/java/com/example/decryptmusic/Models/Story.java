@@ -64,6 +64,7 @@ public class Story {
     }
 
     public String getName() {
+        return name;
         /*if(true) {
             return String.format("%02d.%s.mp3", this.order_in_album -1, this.name.replaceFirst("^\\d+.", "").trim());
         }*/
