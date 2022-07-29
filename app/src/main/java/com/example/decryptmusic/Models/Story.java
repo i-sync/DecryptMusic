@@ -67,7 +67,7 @@ public class Story {
         return name;
         /*if(true) {
             return String.format("%02d.%s.mp3", this.order_in_album -1, this.name.replaceFirst("^\\d+.", "").trim());
-        }*/
+        }
         if (this.type == 2) //plan
         {
             return String.format("%02d.%s.mp3", this.order_in_album , this.name.replaceFirst("^\\d*", "").trim());
@@ -99,7 +99,7 @@ public class Story {
             tName = tName.replaceFirst(sreq, "").trim();
             return String.format("%02d.%s.mp3", Integer.parseInt(index), tName);
         }
-        return tName;
+        return tName;*/
     }
 
     public void setName(String name) {
