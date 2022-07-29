@@ -54,8 +54,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private String rootPath = Environment.getExternalStorageDirectory().getPath();
-    private String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
+    //private String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
     //private String downloadPath = "/mnt/shared/Gen_share";
+    private String downloadPath = "/storage/emulated/0/Download";
     private String dataPath = downloadPath + "/decrypt/data";
     private String sourcePath = downloadPath + "/decrypt/source/"; //String.format("%1$s%4$s%2$s%4$s%3$s%4$s", rootPath, "Music", "source", File.separator);
     private String destPath = downloadPath +  "/decrypt/dest/"; //String.format("%1$s%4$s%2$s%4$s%3$s%4$s", rootPath, "Music", "dest", File.separator);
