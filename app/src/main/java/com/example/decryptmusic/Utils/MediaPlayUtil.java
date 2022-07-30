@@ -125,6 +125,8 @@ public class MediaPlayUtil {
         if(mAudioTrack == null)
             return;
         mAudioTrack.stop();
+        //try to fixed "android.media.AudioTrack: Error code -20 when initializing AudioTrack."
+        mAudioTrack.release();
         mAudioTrack = null;
     }
 
