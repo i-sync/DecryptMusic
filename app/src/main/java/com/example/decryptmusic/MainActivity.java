@@ -3,12 +3,14 @@ package com.example.decryptmusic;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -52,14 +54,30 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView rv_album;
     private RecyclerView rv_story;
 
+    private TextView txt_base_path;
+    private Button btn_base_path;
+
 
     private String rootPath = Environment.getExternalStorageDirectory().getPath();
     //private String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
     //private String downloadPath = "/mnt/shared/Gen_share";
-    private String downloadPath = "/storage/emulated/0/Download";
-    private String dataPath = downloadPath + "/decrypt/data";
-    private String sourcePath = downloadPath + "/decrypt/source/"; //String.format("%1$s%4$s%2$s%4$s%3$s%4$s", rootPath, "Music", "source", File.separator);
-    private String destPath = downloadPath +  "/decrypt/dest/"; //String.format("%1$s%4$s%2$s%4$s%3$s%4$s", rootPath, "Music", "dest", File.separator);
+
+    //private String downloadPath = "/storage/emulated/0/Download";
+    private  String downloadPath = "/mnt/windows/Pictures";
+    public String dataPath(){
+        return downloadPath + "/decrypt/data";
+    }
+
+    public String sourcePath(){
+        return downloadPath + "/decrypt/source/";
+    }
+    //private String sourcePath = String.format("%1$s%4$s%2$s%4$s%3$s%4$s", rootPath, "Music", "source", File.separator);
+
+    public String destPath(){
+        return downloadPath +  "/decrypt/dest/";
+    }
+
+    //private String destPath = String.format("%1$s%4$s%2$s%4$s%3$s%4$s", rootPath, "Music", "dest", File.separator);
 
     private Handler mHandler;
 
@@ -105,8 +123,24 @@ public class MainActivity extends AppCompatActivity {
         btn_stop.setEnabled(false);
         btn_stop_all.setEnabled(false);
 
+        txt_base_path = findViewById(R.id.txt_base_path);
+        btn_base_path = findViewById(R.id.btn_base_path);
 
-        mediaPlayUtil = new MediaPlayUtil(sourcePath, destPath);
+        btn_base_path.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String base_path = String.valueOf(txt_base_path.getText());
+                if(!TextUtils.isEmpty(base_path)){
+                    downloadPath = base_path;
+                    Toast.makeText(getApplicationContext(), downloadPath, Toast.LENGTH_LONG).show();
+                    InitRecyclerView();
+                }
+            }
+        });
+        txt_base_path.setText(downloadPath);
+
+
+        mediaPlayUtil = new MediaPlayUtil(sourcePath(), destPath());
         mediaPlayUtil.txt_info = txt_percent;
 
         mHandler = new Handler();
@@ -116,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void InitRecyclerView()
     {
-        File dataFolder = new File(dataPath);
+        File dataFolder = new File(dataPath());
         if(!dataFolder.exists())
         {
             return;
@@ -233,9 +267,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         String albumStoryPath = story.getAlbum_name() + "/" + story.getName();
-        if (!new File(sourcePath + albumStoryPath).exists())
+        if (!new File(sourcePath()+ albumStoryPath).exists())
         {
-            txt_percent.setText("Source File doesn't exists!"+ sourcePath + albumStoryPath);
+            txt_percent.setText("Source File doesn't exists!"+ sourcePath() + albumStoryPath);
             return;
         }
         mediaPlayUtil.setMayday(story.getMayday());
@@ -270,23 +304,23 @@ public class MainActivity extends AppCompatActivity {
         }
         String albumStoryPath = story.getAlbum_name() + "/" + story.getName();
         // check source file if exists, if not, return
-        File sourceFile = new File(sourcePath + albumStoryPath);
+        File sourceFile = new File(sourcePath() + albumStoryPath);
         if (!sourceFile.exists())
         {
-            txt_percent.setText("Source File doesn't exists!"+ sourcePath + albumStoryPath);
+            txt_percent.setText("Source File doesn't exists!"+ sourcePath() + albumStoryPath);
             return;
         }
         // check dest file if exists, if true, return
-        File destFile = new File(destPath + albumStoryPath);
+        File destFile = new File(destPath() + albumStoryPath);
         if(destFile.exists())
         {
-            txt_percent.setText("Dest File exists!, return. " + destPath + albumStoryPath);
+            txt_percent.setText("Dest File exists!, return. " + destPath() + albumStoryPath);
             return;
         }
         // else, check album folder if exists, if not, create.
-        else if(!new File(destPath + story.getAlbum_name()).exists())
+        else if(!new File(destPath() + story.getAlbum_name()).exists())
         {
-            new File(destPath + story.getAlbum_name()).mkdir();
+            new File(destPath() + story.getAlbum_name()).mkdir();
         }
 
         // check story type, if not encrypt , direct copy file.
@@ -337,9 +371,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         String albumStoryPath = story.getAlbum_name() + "/" + story.getName();
-        if (!new File(destPath + albumStoryPath).exists())
+        if (!new File(destPath() + albumStoryPath).exists())
         {
-            txt_percent.setText("Dest File doesn't exists!"+ destPath + albumStoryPath);
+            txt_percent.setText("Dest File doesn't exists!"+ destPath() + albumStoryPath);
             return;
         }
         mediaPlayUtil.setFileName(albumStoryPath);
@@ -446,36 +480,36 @@ public class MainActivity extends AppCompatActivity {
                 //
                 final String albumStoryPath = story.getAlbum_name() + "/" + story.getName();
                 // check source file if exists, if not, return
-                File sourceFile = new File(sourcePath + albumStoryPath);
+                File sourceFile = new File(sourcePath() + albumStoryPath);
                 if (!sourceFile.exists())
                 {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            txt_name.setText("Source File doesn't exists!"+ sourcePath + albumStoryPath);
+                            txt_name.setText("Source File doesn't exists!"+ sourcePath() + albumStoryPath);
                         }
                     });
-                    Log.i("Story Album", String.format("============> %s", "Source File doesn't exists!"+ sourcePath + albumStoryPath));
+                    Log.i("Story Album", String.format("============> %s", "Source File doesn't exists!"+ sourcePath() + albumStoryPath));
                     continue;
                 }
                 // check dest file if exists, if true, return
-                File destFile = new File(destPath + albumStoryPath);
+                File destFile = new File(destPath() + albumStoryPath);
                 if(destFile.exists())
                 {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            txt_name.setText("Dest File exists!, return. " + destPath + albumStoryPath);
+                            txt_name.setText("Dest File exists!, return. " + destPath() + albumStoryPath);
                         }
                     });
 
-                    Log.i("Story Album", String.format("============> %s", "Dest File exists!, return. " + destPath + albumStoryPath));
+                    Log.i("Story Album", String.format("============> %s", "Dest File exists!, return. " + destPath() + albumStoryPath));
                     continue;
                 }
                 // else, check album folder if exists, if not, create.
-                else if(!new File(destPath + story.getAlbum_name()).exists())
+                else if(!new File(destPath() + story.getAlbum_name()).exists())
                 {
-                    new File(destPath + story.getAlbum_name()).mkdir();
+                    new File(destPath() + story.getAlbum_name()).mkdir();
                 }
 
                 // check story type, if not encrypt , direct copy file.
